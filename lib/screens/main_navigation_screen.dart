@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:barras/barras.dart';
-import 'package:pickabook/screens/scan_screen.dart';
+import 'package:pickabook/screens/chats_screen.dart';
+import 'package:pickabook/screens/notifications_screen.dart';
+import 'package:pickabook/screens/profile_screen.dart';
 
+import 'scan_screen.dart';
 import 'search_list_screen.dart';
+
+class WidgetWithIconAndTitle {
+  Widget? widget;
+  Icon? icon;
+  String? title;
+
+  WidgetWithIconAndTitle({this.widget, this.icon, this.title});
+}
 
 class MainNavigationScreen extends StatefulWidget {
   @override
@@ -13,11 +23,31 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
   String scan = "";
 
-  final List<Widget> _children = [
-    ScanScreen(),
-    SearchListScreen(),
-    Scaffold(
-      body: Text("blat"),
+  final List<WidgetWithIconAndTitle> _children = [
+    WidgetWithIconAndTitle(
+      widget: SearchListScreen(),
+      icon: Icon(Icons.home),
+      title: "Home",
+    ),
+    WidgetWithIconAndTitle(
+      widget: NotificationsScreen(),
+      icon: Icon(Icons.notifications),
+      title: "Notifications",
+    ),
+    WidgetWithIconAndTitle(
+      widget: ChatsScreen(),
+      icon: Icon(Icons.chat),
+      title: "Chat",
+    ),
+    WidgetWithIconAndTitle(
+      widget: ProfileScreen(),
+      icon: Icon(Icons.account_circle),
+      title: "Profile",
+    ),
+    WidgetWithIconAndTitle(
+      widget: ScanScreen(),
+      icon: Icon(Icons.add),
+      title: "Add",
     ),
   ];
 
@@ -30,23 +60,27 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           elevation: 0,
         ),
       ),
-      body: _children[_currentIndex],
+      body: _children[_currentIndex].widget,
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed, // This is all you need!
         currentIndex: _currentIndex,
         onTap: onTabTapped,
         items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.scanner),
-            label: "Scan",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-          )
+          for (var child in _children)
+            BottomNavigationBarItem(icon: child.icon!, label: child.title),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.home),
+          //   label: "Home",
+          // ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.notifications),
+          //   label: "Notificatinos",
+          // ),
+          // BottomNavigationBarItem(
+          //   // activeIcon: Icon(Icons.account_circle_outlined),
+          //   icon: Icon(Icons.account_circle),
+          //   label: "Profile",
+          // ),
         ],
       ),
     );

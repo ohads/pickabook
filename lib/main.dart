@@ -1,13 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import 'screens/search_list_screen.dart';
+import 'package:pickabook/providers/books_provider.dart';
+import 'package:pickabook/screens/chat_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'screens/main_navigation_screen.dart';
+import 'providers/books_provider.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-MaterialColor createMaterialColor(Color color) {
+MaterialColor? createMaterialColor(Color color) {
   List strengths = <double>[.05];
   Map swatch = <int, Color>{};
   final int r = color.red, g = color.green, b = color.blue;
@@ -24,29 +28,55 @@ MaterialColor createMaterialColor(Color color) {
       1,
     );
   });
-  return MaterialColor(color.value, swatch);
+
+  return MaterialColor(color.value, swatch as Map<int, Color>);
+}
+
+Future<FirebaseApp> blat() async {
+  final app = await Firebase.initializeApp();
+  print(app);
+  return app;
 }
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: createMaterialColor(Color(0xFFFFD283)),
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      // home: MyHomePage(title: 'Flutter Demo Home Page'),
-      home: MainNavigationScreen(),
-    );
+    return FutureBuilder(
+        future: Firebase.initializeApp(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return CircularProgressIndicator();
+          }
+          return FutureBuilder<UserCredential>(
+              future: FirebaseAuth.instance.signInWithEmailAndPassword(
+                  email: "ohad@shultzu.com", password: "ohad2121"),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Scaffold(body: CircularProgressIndicator());
+                }
+                return ChangeNotifierProvider(
+                  create: (ctx) => Books(),
+                  child: MaterialApp(
+                    title: 'Flutter Demo',
+                    theme: ThemeData(
+                      primarySwatch: createMaterialColor(Color(0xFFFFD283)),
+                      visualDensity: VisualDensity.adaptivePlatformDensity,
+                    ),
+                    // home: MyHomePage(title: 'Flutter Demo Home Page'),
+                    home: MainNavigationScreen(),
+                    routes: {ChatScreen.routeName: (ctx) => ChatScreen()},
+                  ),
+                );
+              });
+        });
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();

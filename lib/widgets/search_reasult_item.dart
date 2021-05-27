@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:pickabook/models/book.dart';
+import 'package:pickabook/screens/chat_screen.dart';
 
 class SearchResultItem extends StatelessWidget {
   static const double cellHeight = 100;
+
+  final Book book;
+
+  SearchResultItem({required this.book});
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +32,9 @@ class SearchResultItem extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("title"),
-                  Text("author"),
-                  Text("genere"),
+                  Text(book.title!),
+                  Text(book.author!),
+                  Text(book.genere!),
                   Spacer(),
                   Text("פנוי‎"),
                 ],
@@ -41,7 +47,13 @@ class SearchResultItem extends StatelessWidget {
             child: Column(
               children: [
                 Spacer(),
-                Text("send request"),
+                InkWell(
+                  onTap: () {
+                    Navigator.of(context)
+                        .pushNamed(ChatScreen.routeName, arguments: book.owner);
+                  },
+                  child: Text("send request"),
+                ),
               ],
             ),
           )

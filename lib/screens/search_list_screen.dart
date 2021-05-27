@@ -1,13 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:pickabook/widgets/distance_slider.dart';
+import 'package:pickabook/providers/books_provider.dart';
+import 'package:provider/provider.dart';
 
+import '../widgets/distance_slider.dart';
 import '../widgets/genere_bar.dart';
 import '../widgets/search_reasult_item.dart';
+import '../providers/books_provider.dart';
+import '../models/book.dart';
 
-class SearchListScreen extends StatelessWidget {
+class SearchListScreen extends StatefulWidget {
+  @override
+  _SearchListScreenState createState() => _SearchListScreenState();
+}
+
+class _SearchListScreenState extends State<SearchListScreen> {
   TextEditingController searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    searchController.addListener(() {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final booksProvider = Provider.of<Books>(context);
+    final books = booksProvider.books;
+    final availableBooks = books.where((book) {
+      return book.title!
+          .toLowerCase()
+          .contains(searchController.text.toLowerCase());
+    });
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       appBar: PreferredSize(
@@ -57,13 +82,7 @@ class SearchListScreen extends StatelessWidget {
               child: Column(
                 children: [
                   Text("header"),
-                  SearchResultItem(),
-                  SearchResultItem(),
-                  SearchResultItem(),
-                  SearchResultItem(),
-                  SearchResultItem(),
-                  SearchResultItem(),
-                  SearchResultItem(),
+                  for (Book book in availableBooks) SearchResultItem(book: book)
                 ],
               ),
             ),

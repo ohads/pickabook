@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:barras/barras.dart';
+// import 'package:barras/barras.dart';
 import 'package:http/http.dart' as http;
 
 class ScanScreen extends StatefulWidget {
@@ -11,9 +11,18 @@ class _ScanScreenState extends State<ScanScreen> {
   String scan = "";
 
   void scanA() async {
-    final code = await Barras.scan(context);
-    final json =
-        await http.get("https://www.googleapis.com/books/v1/volumes?q=$code");
+    final code = 1; //await Barras.scan(context);
+    if (code == null) {
+      return;
+    }
+    final uri = Uri(
+        host: "www.googleapis.com",
+        scheme: "https",
+        path: "/books/v1/volumes",
+        query: "q=$code");
+
+    print(uri);
+    final json = await http.get(uri);
     setState(() {
       scan = json.body;
     });
@@ -25,8 +34,8 @@ class _ScanScreenState extends State<ScanScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            TextButton(onPressed: scanA, child: Text("scan")),
             Text(scan),
-            FlatButton(onPressed: scanA, child: Text("scan"))
           ],
         ),
       ),
